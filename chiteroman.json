@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 6a",
-  "FINGERPRINT": "google/bluejay_beta/bluejay:16/CP11.251114.007/14621658:user/release-keys",
-  "PRODUCT": "bluejay_beta",
-  "DEVICE": "bluejay",
-  "SECURITY_PATCH": "2025-12-05",
+  "MODEL": "Pixel 7a",
+  "FINGERPRINT": "google/lynx_beta/lynx:16/CP11.251114.004.A2/14621609:user/release-keys",
+  "PRODUCT": "lynx_beta",
+  "DEVICE": "lynx",
+  "SECURITY_PATCH": "2025-11-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
