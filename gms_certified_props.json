@@ -1,12 +1,12 @@
 {
     "MANUFACTURER": "Google",
-    "MODEL": "Pixel 9 Pro",
-    "FINGERPRINT": "google/caiman_beta/caiman:16/CP11.251114.007/14621658:user/release-keys",
+    "MODEL": "Pixel 7a",
+    "FINGERPRINT": "google/lynx_beta/lynx:16/CP11.251114.004.A2/14621609:user/release-keys",
     "BRAND": "google",
-    "PRODUCT": "caiman_beta",
-    "DEVICE": "caiman",
+    "PRODUCT": "lynx_beta",
+    "DEVICE": "lynx",
     "VERSION.RELEASE": "16",
-    "ID": "CP11.251114.007",
-    "VERSION.SECURITY_PATCH": "2025-12-05",
+    "ID": "CP11.251114.004.A2",
+    "VERSION.SECURITY_PATCH": "2025-11-05",
     "VERSION.DEVICE_INITIAL_SDK_INT": "32"
 }
