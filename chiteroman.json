@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 8 Pro",
-  "FINGERPRINT": "google/husky_beta/husky:16/CP11.251209.007.A1/14691868:user/release-keys",
-  "PRODUCT": "husky_beta",
-  "DEVICE": "husky",
+  "MODEL": "Pixel Tablet",
+  "FINGERPRINT": "google/tangorpro_beta/tangorpro:16/CP11.251209.007.A1/14691868:user/release-keys",
+  "PRODUCT": "tangorpro_beta",
+  "DEVICE": "tangorpro",
   "SECURITY_PATCH": "2026-01-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
