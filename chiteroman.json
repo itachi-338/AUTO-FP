@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 8",
-  "FINGERPRINT": "google/shiba_beta/shiba:16/CP11.251209.007.A1/14691868:user/release-keys",
-  "PRODUCT": "shiba_beta",
-  "DEVICE": "shiba",
+  "MODEL": "Pixel 8 Pro",
+  "FINGERPRINT": "google/husky_beta/husky:16/CP11.251209.007.A1/14691868:user/release-keys",
+  "PRODUCT": "husky_beta",
+  "DEVICE": "husky",
   "SECURITY_PATCH": "2026-01-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
