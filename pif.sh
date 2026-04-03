@@ -1,30 +1,45 @@
-#!/bin/bash
+#!/bin/sh
 
-# Print a message indicating the start of the crawling process
-echo "Crawling Android Developers for latest Pixel Beta ..."
+echo "Crawling Android Developers for latest Pixel Beta (A17+ Support) ..."
 
+# 1. Fetch main versions page and find the highest numeric version (e.g., 17)
 wget -q -O PIXEL_VERSIONS_HTML --no-check-certificate https://developer.android.com/about/versions 2>&1 || exit 1;
-wget -q -O PIXEL_LATEST_HTML --no-check-certificate $(grep -o 'https://developer.android.com/about/versions/17/.*[0-9]"' PIXEL_VERSIONS_HTML | sort -ru | cut -d\" -f1 | head -n1 | tail -n1) 2>&1 || exit 1;
-wget -q -O PIXEL_OTA_HTML --no-check-certificate https://developer.android.com$(grep -o 'href=".*download-ota.*"' PIXEL_LATEST_HTML | cut -d\" -f2 | head -n1 | tail -n1) 2>&1 || exit 1;
-echo "$(grep -m1 -oE 'tooltip>Android .*[0-9]' PIXEL_OTA_HTML | cut -d\> -f2) $(grep -oE 'tooltip>Android [0-9]+.*Beta' PIXEL_OTA_HTML | cut -d\> -f2 | head -n1 | tail -n1)";
+LATEST_VER_URL=$(grep -o 'https://developer.android.com/about/versions/[0-9]\{2\}' PIXEL_VERSIONS_HTML | sort -Vru | head -n1)
 
+wget -q -O PIXEL_LATEST_HTML --no-check-certificate "$LATEST_VER_URL" 2>&1 || exit 1;
+
+# 2. Find the OTA page. Removed the strict 'qpr' requirement to allow early Betas.
+OTA_RELATIVE_URL=$(grep -o 'href="[^"]*download-ota[^"]*"' PIXEL_LATEST_HTML | cut -d\" -f2 | head -n1)
+wget -q -O PIXEL_OTA_HTML --no-check-certificate "https://developer.android.com$OTA_RELATIVE_URL" 2>&1 || exit 1;
+
+# 3. Extract Version Info
+# Updated regex to be more flexible with Android version naming
+ANDROID_VER=$(grep -m1 -oE 'tooltip>Android [0-9]+' PIXEL_OTA_HTML | cut -d\  -f2)
+BETA_VER=$(grep -oE 'tooltip>(QPR|Beta|Developer Preview).*[0-9]' PIXEL_OTA_HTML | cut -d\> -f2 | head -n1)
+echo "Found: Android $ANDROID_VER ($BETA_VER)"
+
+# 4. Handle Release Dates
 if grep -q 'Release date' PIXEL_OTA_HTML; then
-  LONG_REL_DATE="$(grep -m1 -A1 'Release date' PIXEL_OTA_HTML)";
+  LONG_REL_DATE="$(grep -m1 -A1 'Release date' PIXEL_OTA_HTML | tail -n1 | sed 's;.*<td>\(.*\)</td>.*;\1;')";
 else
-  wget -q -O PIXEL_FI_HTML --no-check-certificate https://developer.android.com$(grep -o 'href=".*download.*"' PIXEL_LATEST_HTML | cut -d\" -f2 | head -n1 | tail -n1) 2>&1 || exit 1;
-  LONG_REL_DATE="$(grep -m1 -A1 'Release date' PIXEL_FI_HTML)";
+  # Fallback to the 'get' or 'download' page if date is missing from OTA page
+  GET_URL=$(grep -o 'href="[^"]*download[^"]*"' PIXEL_LATEST_HTML | head -n1 | cut -d\" -f2)
+  wget -q -O PIXEL_FI_HTML --no-check-certificate "https://developer.android.com$GET_URL" 2>&1 || exit 1;
+  LONG_REL_DATE="$(grep -m1 -A1 'Release date' PIXEL_FI_HTML | tail -n1 | sed 's;.*<td>\(.*\)</td>.*;\1;')";
 fi;
 
-BETA_REL_DATE="$(date -D '%B %e, %Y' -d "$(echo $LONG_REL_DATE | tail -n1 | sed 's;.*<td>\(.*\)</td>.*;\1;')" '+%Y-%m-%d')";
-BETA_EXP_DATE="$(date -D '%s' -d "$(($(date -D '%Y-%m-%d' -d "$BETA_REL_DATE" '+%s') + 60 * 60 * 24 * 7 * 6))" '+%Y-%m-%d')";
-echo "Beta Released: $BETA_REL_DATE \
-  \nEstimated Expiry: $BETA_EXP_DATE";
+# Date formatting (Using standard -d for compatibility)
+BETA_REL_DATE="$(date -d "$LONG_REL_DATE" '+%Y-%m-%d')";
+BETA_EXP_DATE="$(date -d "$BETA_REL_DATE + 42 days" '+%Y-%m-%d')";
+echo "Beta Released: $BETA_REL_DATE | Estimated Expiry: $BETA_EXP_DATE";
 
+# 5. Build Device Lists
 MODEL_LIST="$(grep -A1 'tr id=' PIXEL_OTA_HTML | grep 'td' | sed 's;.*<td>\(.*\)</td>;\1;')";
 PRODUCT_LIST="$(grep 'tr id=' PIXEL_OTA_HTML | sed 's;.*<tr id="\(.*\)">;\1_beta;')";
 OTA_LIST="$(grep -o '>.*_beta.*</button' PIXEL_OTA_HTML | sed 's;.*>\(.*\)</button;\1;')";
 OTA_PREFIX="$(grep -m1 'ota/.*_beta' PIXEL_OTA_HTML | cut -d\" -f2 | sed 's;\(.*\)/.*;\1;')";
 
+# 6. Device Selection
 if [ "$FORCE_MATCH" ]; then
   DEVICE="$(getprop ro.product.device)";
   case "$(echo ' '$PRODUCT_LIST' ')" in
@@ -35,36 +50,33 @@ if [ "$FORCE_MATCH" ]; then
     ;;
   esac;
 fi;
-item "Selecting Pixel Beta device ...";
+
 if [ -z "$PRODUCT" ]; then
   set_random_beta() {
     local list_count="$(echo "$MODEL_LIST" | wc -l)";
     local list_rand="$((RANDOM % $list_count + 1))";
-    local IFS=$'\n';
-    set -- $MODEL_LIST;
-    MODEL="$(eval echo \${$list_rand})";
-    set -- $PRODUCT_LIST;
-    PRODUCT="$(eval echo \${$list_rand})";
-    set -- $OTA_LIST;
-    OTA="$OTA_PREFIX/$(eval echo \${$list_rand})";
+    MODEL="$(echo "$MODEL_LIST" | sed -n "${list_rand}p")";
+    PRODUCT="$(echo "$PRODUCT_LIST" | sed -n "${list_rand}p")";
+    OTA_FILE="$(echo "$OTA_LIST" | sed -n "${list_rand}p")";
+    OTA="$OTA_PREFIX/$OTA_FILE";
     DEVICE="$(echo "$PRODUCT" | sed 's/_beta//')";
   }
   set_random_beta;
 fi;
-echo "$MODEL ($PRODUCT)";
+echo "Selected: $MODEL ($PRODUCT)";
 
-(ulimit -f 2; wget -q -O PIXEL_ZIP_METADATA --no-check-certificate $OTA) 2>/dev/null;
+# 7. Extract Fingerprint & Security Patch
+(ulimit -f 2; wget -q -O PIXEL_ZIP_METADATA --no-check-certificate "https://developer.android.com/$OTA") 2>/dev/null;
 FINGERPRINT="$(grep -am1 'post-build=' PIXEL_ZIP_METADATA 2>/dev/null | cut -d= -f2)";
 SECURITY_PATCH="$(grep -am1 'security-patch-level=' PIXEL_ZIP_METADATA 2>/dev/null | cut -d= -f2)";
-if [ -z "$FINGERPRINT" -o -z "$SECURITY_PATCH" ]; then
-  case "$(getprop ro.product.cpu.abi)" in
-    armeabi-v7a|x86) [ "$BUSYBOX" ] && ISBB32MSG=", install wget2";;
-  esac;
-  echo "\nError: Failed to extract information from metadata$ISBB32MSG!";
+
+if [ -z "$FINGERPRINT" ]; then
+  echo "Error: Could not extract metadata from OTA link.";
   exit 1;
 fi;
 
-item "Dumping values to minimal pif.json ...";
+# 8. Generate pif.json
+# Note: For Android 17, the SDK Level is 37.
 cat <<EOF | tee pif.json;
 {
   "MANUFACTURER": "Google",
@@ -73,7 +85,7 @@ cat <<EOF | tee pif.json;
   "PRODUCT": "$PRODUCT",
   "DEVICE": "$DEVICE",
   "SECURITY_PATCH": "$SECURITY_PATCH",
-  "DEVICE_INITIAL_SDK_INT": "32"
+  "DEVICE_INITIAL_SDK_INT": "37"
 }
 EOF
 
@@ -89,7 +101,7 @@ cat <<EOF | tee pif2.json;
     "VERSION.RELEASE": "$(echo "$FINGERPRINT" | cut -d ':' -f 2 | cut -d '/' -f 1)",
     "ID": "$(echo "$FINGERPRINT" | cut -d '/' -f 4)",
     "VERSION.SECURITY_PATCH": "$SECURITY_PATCH",
-    "VERSION.DEVICE_INITIAL_SDK_INT": "32"
+    "VERSION.DEVICE_INITIAL_SDK_INT": "37"
 }
 EOF
 
