@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel Tablet",
-  "FINGERPRINT": "google/tangorpro_beta/tangorpro:CANARY/ZP11.260320.008/15205769:user/release-keys",
-  "PRODUCT": "tangorpro_beta",
-  "DEVICE": "tangorpro",
+  "MODEL": "Pixel 10",
+  "FINGERPRINT": "google/frankel_beta/frankel:CANARY/ZP11.260320.007/15154667:user/release-keys",
+  "PRODUCT": "frankel_beta",
+  "DEVICE": "frankel",
   "SECURITY_PATCH": "2026-04-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
