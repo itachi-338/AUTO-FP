@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 9 Pro Fold",
-  "FINGERPRINT": "google/comet_beta/comet:CANARY/ZP11.260320.007/15154667:user/release-keys",
-  "PRODUCT": "comet_beta",
-  "DEVICE": "comet",
+  "MODEL": "Pixel 10 Pro Fold",
+  "FINGERPRINT": "google/rango_beta/rango:CANARY/ZP11.260320.007/15154667:user/release-keys",
+  "PRODUCT": "rango_beta",
+  "DEVICE": "rango",
   "SECURITY_PATCH": "2026-04-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
