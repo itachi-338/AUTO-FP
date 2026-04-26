@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 7a",
-  "FINGERPRINT": "google/lynx_beta/lynx:CANARY/ZP11.260320.008/15205769:user/release-keys",
-  "PRODUCT": "lynx_beta",
-  "DEVICE": "lynx",
+  "MODEL": "Pixel 7",
+  "FINGERPRINT": "google/panther_beta/panther:CANARY/ZP11.260320.008/15205769:user/release-keys",
+  "PRODUCT": "panther_beta",
+  "DEVICE": "panther",
   "SECURITY_PATCH": "2026-04-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
