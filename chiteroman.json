@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 6 Pro",
-  "FINGERPRINT": "google/raven_beta/raven:CANARY/ZP11.260320.008/15205769:user/release-keys",
-  "PRODUCT": "raven_beta",
-  "DEVICE": "raven",
+  "MODEL": "Pixel 10 Pro Fold",
+  "FINGERPRINT": "google/rango_beta/rango:CANARY/ZP11.260320.007/15154667:user/release-keys",
+  "PRODUCT": "rango_beta",
+  "DEVICE": "rango",
   "SECURITY_PATCH": "2026-04-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
