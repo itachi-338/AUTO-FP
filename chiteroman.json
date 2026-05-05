@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 8 Pro",
-  "FINGERPRINT": "google/husky_beta/husky:CANARY/ZP11.260320.007/15154667:user/release-keys",
-  "PRODUCT": "husky_beta",
-  "DEVICE": "husky",
+  "MODEL": "Pixel 9 Pro Fold",
+  "FINGERPRINT": "google/comet_beta/comet:CANARY/ZP11.260320.007/15154667:user/release-keys",
+  "PRODUCT": "comet_beta",
+  "DEVICE": "comet",
   "SECURITY_PATCH": "2026-04-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
