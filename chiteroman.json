@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 6 Pro",
-  "FINGERPRINT": "google/raven_beta/raven:CANARY/ZP11.260515.009/15513807:user/release-keys",
-  "PRODUCT": "raven_beta",
-  "DEVICE": "raven",
+  "MODEL": "Pixel Tablet",
+  "FINGERPRINT": "google/tangorpro_beta/tangorpro:CANARY/ZP11.260515.009/15513807:user/release-keys",
+  "PRODUCT": "tangorpro_beta",
+  "DEVICE": "tangorpro",
   "SECURITY_PATCH": "2026-06-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
