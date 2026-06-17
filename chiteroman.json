@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel Fold",
-  "FINGERPRINT": "google/felix_beta/felix:CANARY/ZP11.260515.009/15513807:user/release-keys",
-  "PRODUCT": "felix_beta",
-  "DEVICE": "felix",
+  "MODEL": "Pixel 8",
+  "FINGERPRINT": "google/shiba_beta/shiba:CANARY/ZP11.260515.009/15513807:user/release-keys",
+  "PRODUCT": "shiba_beta",
+  "DEVICE": "shiba",
   "SECURITY_PATCH": "2026-06-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
