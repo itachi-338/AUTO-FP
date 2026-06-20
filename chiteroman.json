@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel Fold",
-  "FINGERPRINT": "google/felix_beta/felix:CANARY/ZP11.260515.009/15513807:user/release-keys",
-  "PRODUCT": "felix_beta",
-  "DEVICE": "felix",
+  "MODEL": "Pixel 7a",
+  "FINGERPRINT": "google/lynx_beta/lynx:CANARY/ZP11.260515.009/15513807:user/release-keys",
+  "PRODUCT": "lynx_beta",
+  "DEVICE": "lynx",
   "SECURITY_PATCH": "2026-06-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
