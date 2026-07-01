@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 6",
-  "FINGERPRINT": "google/oriole_beta/oriole:CANARY/ZP11.260515.009/15513807:user/release-keys",
-  "PRODUCT": "oriole_beta",
-  "DEVICE": "oriole",
+  "MODEL": "Pixel 9 Pro Fold",
+  "FINGERPRINT": "google/comet_beta/comet:CANARY/ZP11.260515.009/15513807:user/release-keys",
+  "PRODUCT": "comet_beta",
+  "DEVICE": "comet",
   "SECURITY_PATCH": "2026-06-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
