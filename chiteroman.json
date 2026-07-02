@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 10 Pro XL",
-  "FINGERPRINT": "google/mustang_beta/mustang:CANARY/ZP11.260515.009/15513807:user/release-keys",
-  "PRODUCT": "mustang_beta",
-  "DEVICE": "mustang",
+  "MODEL": "Pixel 7",
+  "FINGERPRINT": "google/panther_beta/panther:CANARY/ZP11.260515.009/15513807:user/release-keys",
+  "PRODUCT": "panther_beta",
+  "DEVICE": "panther",
   "SECURITY_PATCH": "2026-06-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
