@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 8",
-  "FINGERPRINT": "google/shiba_beta/shiba:CANARY/ZP11.260515.009/15513807:user/release-keys",
-  "PRODUCT": "shiba_beta",
-  "DEVICE": "shiba",
+  "MODEL": "Pixel 6a",
+  "FINGERPRINT": "google/bluejay_beta/bluejay:CANARY/ZP11.260515.009/15513807:user/release-keys",
+  "PRODUCT": "bluejay_beta",
+  "DEVICE": "bluejay",
   "SECURITY_PATCH": "2026-06-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
