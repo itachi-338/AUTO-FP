@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 10 Pro XL",
-  "FINGERPRINT": "google/mustang_beta/mustang:CANARY/ZP11.260618.005/15760424:user/release-keys",
-  "PRODUCT": "mustang_beta",
-  "DEVICE": "mustang",
+  "MODEL": "Pixel 6",
+  "FINGERPRINT": "google/oriole_beta/oriole:CANARY/ZP11.260618.005/15760424:user/release-keys",
+  "PRODUCT": "oriole_beta",
+  "DEVICE": "oriole",
   "SECURITY_PATCH": "2026-07-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
