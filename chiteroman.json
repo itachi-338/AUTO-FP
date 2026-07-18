@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 9 Pro",
-  "FINGERPRINT": "google/caiman_beta/caiman:CANARY/ZP11.260618.005/15760424:user/release-keys",
-  "PRODUCT": "caiman_beta",
-  "DEVICE": "caiman",
+  "MODEL": "Pixel 8a",
+  "FINGERPRINT": "google/akita_beta/akita:CANARY/ZP11.260618.005/15760424:user/release-keys",
+  "PRODUCT": "akita_beta",
+  "DEVICE": "akita",
   "SECURITY_PATCH": "2026-07-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
