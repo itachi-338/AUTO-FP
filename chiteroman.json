@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 8 Pro",
-  "FINGERPRINT": "google/husky_beta/husky:CANARY/ZP11.260618.005/15760424:user/release-keys",
-  "PRODUCT": "husky_beta",
-  "DEVICE": "husky",
+  "MODEL": "Pixel 9a",
+  "FINGERPRINT": "google/tegu_beta/tegu:CANARY/ZP11.260618.005/15760424:user/release-keys",
+  "PRODUCT": "tegu_beta",
+  "DEVICE": "tegu",
   "SECURITY_PATCH": "2026-07-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
