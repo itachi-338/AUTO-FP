@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel Fold",
-  "FINGERPRINT": "google/felix_beta/felix:CANARY/ZP11.260618.005/15760424:user/release-keys",
-  "PRODUCT": "felix_beta",
-  "DEVICE": "felix",
+  "MODEL": "Pixel 8a",
+  "FINGERPRINT": "google/akita_beta/akita:CANARY/ZP11.260618.005/15760424:user/release-keys",
+  "PRODUCT": "akita_beta",
+  "DEVICE": "akita",
   "SECURITY_PATCH": "2026-07-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
