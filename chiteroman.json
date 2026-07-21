@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 6 Pro",
-  "FINGERPRINT": "google/raven_beta/raven:CANARY/ZP11.260618.005/15760424:user/release-keys",
-  "PRODUCT": "raven_beta",
-  "DEVICE": "raven",
+  "MODEL": "Pixel 8 Pro",
+  "FINGERPRINT": "google/husky_beta/husky:CANARY/ZP11.260618.005/15760424:user/release-keys",
+  "PRODUCT": "husky_beta",
+  "DEVICE": "husky",
   "SECURITY_PATCH": "2026-07-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
