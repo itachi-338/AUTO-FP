@@ -1,9 +1,9 @@
 {
   "MANUFACTURER": "Google",
-  "MODEL": "Pixel 10 Pro XL",
-  "FINGERPRINT": "google/mustang_beta/mustang:CANARY/ZP11.260717.006/16004061:user/release-keys",
-  "PRODUCT": "mustang_beta",
-  "DEVICE": "mustang",
+  "MODEL": "Pixel 8",
+  "FINGERPRINT": "google/shiba_beta/shiba:CANARY/ZP11.260717.006/16004061:user/release-keys",
+  "PRODUCT": "shiba_beta",
+  "DEVICE": "shiba",
   "SECURITY_PATCH": "2026-08-05",
   "DEVICE_INITIAL_SDK_INT": "32"
 }
