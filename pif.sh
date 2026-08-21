@@ -1,6 +1,4 @@
 #!/bin/bash
-
-#!/bin/bash
 set -e
 
 echo "Crawling Android Developers for latest Pixel Beta..."
@@ -8,25 +6,28 @@ echo "Crawling Android Developers for latest Pixel Beta..."
 # Fetch main Android versions page
 wget -q -O PIXEL_VERSIONS_HTML --no-check-certificate https://developer.android.com/about/versions || exit 1
 
-# Extract latest numeric Android version URL using version sort (sort -V)
-LATEST_VERSION_URL=$(grep -oE 'https://developer\.android\.com/about/versions/[0-9a-zA-Z_-]+' PIXEL_VERSIONS_HTML | grep -v 'download' | sort -V -r | head -n1)
+# Extract ONLY numeric versions (e.g., /about/versions/17) to prevent matching legacy named pages like /pie or /oreo
+LATEST_VERSION_URL=$(grep -oE 'https://developer\.android\.com/about/versions/[0-9]+' PIXEL_VERSIONS_HTML | sort -n -r | head -n1)
 
+# If no numeric page is found, fall back to the main preview page
 if [ -z "$LATEST_VERSION_URL" ]; then
-  echo "Error: Could not find latest Android version page!"
-  exit 1
+  LATEST_VERSION_URL="https://developer.android.com/about/versions/preview"
 fi
 
 echo "Found Latest Release Page: $LATEST_VERSION_URL"
 wget -q -O PIXEL_BETA_HTML --no-check-certificate "$LATEST_VERSION_URL" || exit 1
 
-# Extract OTA download page URL
+# Extract OTA download page path
 OTA_PAGE_PATH=$(grep -oE 'href="[^"]*download-ota[^"]*"' PIXEL_BETA_HTML | cut -d'"' -f2 | head -n1)
 
+# If not found on version page, search main versions page or use fallback endpoint
 if [ -z "$OTA_PAGE_PATH" ]; then
   OTA_PAGE_PATH=$(grep -oE 'href="[^"]*download-ota[^"]*"' PIXEL_VERSIONS_HTML | cut -d'"' -f2 | head -n1)
 fi
 
-if [[ "$OTA_PAGE_PATH" != http* ]]; then
+if [ -z "$OTA_PAGE_PATH" ]; then
+  OTA_PAGE_URL="https://developer.android.com/about/versions/preview/download-ota"
+elif [[ "$OTA_PAGE_PATH" != http* ]]; then
   OTA_PAGE_URL="https://developer.android.com${OTA_PAGE_PATH}"
 else
   OTA_PAGE_URL="$OTA_PAGE_PATH"
@@ -47,13 +48,17 @@ MODEL_LIST="$(grep -A1 'tr id=' PIXEL_OTA_HTML | grep 'td' | sed 's;.*<td>\(.*\)
 PRODUCT_LIST="$(grep -o 'ota/.*_beta' PIXEL_OTA_HTML | cut -d\/ -f2)"
 OTA_LIST="$(grep 'ota/.*_beta' PIXEL_OTA_HTML | cut -d\" -f2)"
 
-# Check if a specific model was passed via command line (e.g., ./script.sh -m panther)
+if [ -z "$PRODUCT_LIST" ]; then
+  echo "Error: No Pixel Beta OTA links found on $OTA_PAGE_URL"
+  exit 1
+fi
+
+# Check for targeted device flag (-m device_name)
 TARGET_DEVICE=""
 if [ "$1" == "-m" ] && [ -n "$2" ]; then
   TARGET_DEVICE="$2"
 fi
 
-# GitHub Actions runner check: Use getprop only if running directly on an Android device
 if [ -n "$TARGET_DEVICE" ]; then
   PRODUCT="${TARGET_DEVICE}_beta"
   DEVICE="$TARGET_DEVICE"
@@ -66,7 +71,7 @@ elif command -v getprop >/dev/null 2>&1 && [ -n "$(getprop ro.product.device 2>/
   OTA="$(echo "$OTA_LIST" | grep "$PRODUCT" | head -n1)"
 fi
 
-# Default to random device selection for automated non-interactive runners
+# Select a random Pixel device if no explicit target was set
 if [ -z "$OTA" ] || [ -z "$PRODUCT" ]; then
   echo "Selecting random Pixel Beta device..."
   list_count="$(echo "$PRODUCT_LIST" | wc -l)"
@@ -87,21 +92,21 @@ fi
 
 echo "Selected Device: $MODEL ($PRODUCT)"
 
-# Download OTA header metadata
+# Download OTA metadata
 (ulimit -f 4; wget -q -O PIXEL_ZIP_METADATA --no-check-certificate "$OTA") 2>/dev/null || true
 
 FINGERPRINT="$(grep -am1 'post-build=' PIXEL_ZIP_METADATA | cut -d= -f2 | tr -d '\r')"
 SECURITY_PATCH="$(grep -am1 'security-patch-level=' PIXEL_ZIP_METADATA | cut -d= -f2 | tr -d '\r')"
 
 if [ -z "$FINGERPRINT" ] || [ -z "$SECURITY_PATCH" ]; then
-  echo "Error: Failed to extract fingerprint or security patch level!"
+  echo "Error: Failed to extract fingerprint or security patch level from metadata!"
   exit 1
 fi
 
 echo "Extracted Fingerprint: $FINGERPRINT"
 echo "Extracted Security Patch: $SECURITY_PATCH"
 
-# Write pif.json output
+# Generate pif.json output
 cat <<EOF > pif.json
 {
   "MANUFACTURER": "Google",
@@ -113,6 +118,8 @@ cat <<EOF > pif.json
   "DEVICE_INITIAL_SDK_INT": "32"
 }
 EOF
+
+echo "Successfully dumped values to pif.json"
 
 # Remove temporary HTML files if they exist
 find . -maxdepth 1 -name "*_HTML" -exec rm {} \;
