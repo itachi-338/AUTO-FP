@@ -4,7 +4,7 @@ set -e
 echo "Fetching Android 17 Beta OTA metadata directly..."
 
 # Hardcoded primary and fallback URLs for Android 17 Beta OTA downloads
-URL_A17="https://developer.android.com/about/versions/17/download-ota"
+URL_A17="https://developer.android.com/about/versions/17/qpr2/download-ota"
 URL_PREVIEW="https://developer.android.com/about/versions/preview/download-ota"
 
 # Attempt to fetch the Android 17 OTA page
