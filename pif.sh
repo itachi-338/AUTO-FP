@@ -1,36 +1,44 @@
 #!/bin/bash
 set -e
 
-echo "Fetching Android 17 Beta OTA metadata directly..."
+echo "Fetching Android 17 QPR2 Beta OTA metadata directly..."
 
-# Hardcoded primary and fallback URLs for Android 17 Beta OTA downloads
-URL_A17="https://developer.android.com/about/versions/17/qpr2/download-ota"
-URL_PREVIEW="https://developer.android.com/about/versions/preview/download-ota"
+# Prioritize exact Android 17 QPR2 Beta OTA endpoints
+ENDPOINTS=(
+  "https://developer.android.com/about/versions/17/qpr2/download-ota"
+  "https://developer.android.com/about/versions/17/download-ota-qpr"
+  "https://developer.android.com/about/versions/17/qpr1/download-ota"
+)
 
-# Attempt to fetch the Android 17 OTA page
-if wget -q -O PIXEL_OTA_HTML --no-check-certificate "$URL_A17" 2>/dev/null && grep -q 'ota/.*_beta' PIXEL_OTA_HTML; then
-  echo "Targeting Endpoint: $URL_A17"
-elif wget -q -O PIXEL_OTA_HTML --no-check-certificate "$URL_PREVIEW" 2>/dev/null && grep -q 'ota/.*_beta' PIXEL_OTA_HTML; then
-  echo "Targeting Endpoint: $URL_PREVIEW"
-else
-  echo "Error: Unable to locate Android 17 Beta OTA links on Google's portal!"
+OTA_URL=""
+for url in "${ENDPOINTS[@]}"; do
+  if wget -q -O PIXEL_OTA_HTML --no-check-certificate "$url" 2>/dev/null && grep -q 'ota/.*_beta' PIXEL_OTA_HTML; then
+    OTA_URL="$url"
+    break
+  fi
+done
+
+if [ -z "$OTA_URL" ]; then
+  echo "Error: Unable to locate Android 17 QPR2 Beta OTA links!"
   exit 1
 fi
 
-# Extract date metadata
+echo "Targeting Endpoint: $OTA_URL"
+
+# Extract release and estimated expiry dates
 BETA_REL_DATE="$(date -d "$(grep -m1 -A1 'Release date' PIXEL_OTA_HTML | tail -n1 | sed 's;.*<td>\(.*\)</td>.*;\1;')" '+%Y-%m-%d' 2>/dev/null || date '+%Y-%m-%d')"
 BETA_EXP_DATE="$(date -d "@$(($(date -d "$BETA_REL_DATE" '+%s' 2>/dev/null || echo 0) + 60 * 60 * 24 * 7 * 6))" '+%Y-%m-%d' 2>/dev/null || echo "Unknown")"
 
 echo "Beta Released: $BETA_REL_DATE"
 echo "Estimated Expiry: $BETA_EXP_DATE"
 
-# Extract models, products, and OTA URL lists
+# Extract model list, product list, and OTA download links
 MODEL_LIST="$(grep -A1 'tr id=' PIXEL_OTA_HTML | grep 'td' | sed 's;.*<td>\(.*\)</td>;\1;')"
 PRODUCT_LIST="$(grep -o 'ota/.*_beta' PIXEL_OTA_HTML | cut -d\/ -f2)"
 OTA_LIST="$(grep 'ota/.*_beta' PIXEL_OTA_HTML | cut -d\" -f2)"
 
 if [ -z "$PRODUCT_LIST" ]; then
-  echo "Error: No Pixel Beta OTA links found on page."
+  echo "Error: No Pixel Beta OTA links found on $OTA_URL"
   exit 1
 fi
 
@@ -52,9 +60,9 @@ elif command -v getprop >/dev/null 2>&1 && [ -n "$(getprop ro.product.device 2>/
   OTA="$(echo "$OTA_LIST" | grep "$PRODUCT" | head -n1)"
 fi
 
-# Default to random selection if no specific device is targeted
+# Pick a random device if no specific target is specified
 if [ -z "$OTA" ] || [ -z "$PRODUCT" ]; then
-  echo "Selecting random Pixel device from Android 17 list..."
+  echo "Selecting random Pixel device from Android 17 QPR2 list..."
   list_count="$(echo "$PRODUCT_LIST" | wc -l)"
   list_rand="$((RANDOM % list_count + 1))"
 
@@ -73,7 +81,7 @@ fi
 
 echo "Selected Device: $MODEL ($PRODUCT)"
 
-# Download first 32KB of OTA zip headers safely for metadata parsing
+# Fetch first 32KB of the OTA ZIP to read metadata headers safely in GitHub Actions
 wget -q --header="Range: bytes=0-32768" -O PIXEL_ZIP_METADATA --no-check-certificate "$OTA" || true
 
 FINGERPRINT="$(grep -am1 'post-build=' PIXEL_ZIP_METADATA | cut -d= -f2 | tr -d '\r')"
@@ -87,7 +95,7 @@ fi
 echo "Extracted Fingerprint: $FINGERPRINT"
 echo "Extracted Security Patch: $SECURITY_PATCH"
 
-# Output pif.json
+# Write pif.json output
 cat <<EOF > pif.json
 {
   "MANUFACTURER": "Google",
@@ -100,7 +108,7 @@ cat <<EOF > pif.json
 }
 EOF
 
-echo "Successfully dumped Android 17 values to pif.json"
+echo "Successfully dumped Android 17 QPR2 values to pif.json"
 
 # Remove temporary HTML files if they exist
 find . -maxdepth 1 -name "*_HTML" -exec rm {} \;
