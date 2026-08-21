@@ -1,40 +1,21 @@
 #!/bin/bash
 set -e
 
-echo "Crawling Android Developers for latest Pixel Beta..."
+echo "Fetching Android 17 Beta OTA metadata directly..."
 
-# Fetch main Android versions page
-wget -q -O PIXEL_VERSIONS_HTML --no-check-certificate https://developer.android.com/about/versions || exit 1
+# Hardcoded primary and fallback URLs for Android 17 Beta OTA downloads
+URL_A17="https://developer.android.com/about/versions/17/download-ota"
+URL_PREVIEW="https://developer.android.com/about/versions/preview/download-ota"
 
-# Extract ONLY numeric versions (e.g., /about/versions/17) to prevent matching legacy named pages like /pie or /oreo
-LATEST_VERSION_URL=$(grep -oE 'https://developer\.android\.com/about/versions/[0-9]+' PIXEL_VERSIONS_HTML | sort -n -r | head -n1)
-
-# If no numeric page is found, fall back to the main preview page
-if [ -z "$LATEST_VERSION_URL" ]; then
-  LATEST_VERSION_URL="https://developer.android.com/about/versions/preview"
-fi
-
-echo "Found Latest Release Page: $LATEST_VERSION_URL"
-wget -q -O PIXEL_BETA_HTML --no-check-certificate "$LATEST_VERSION_URL" || exit 1
-
-# Extract OTA download page path
-OTA_PAGE_PATH=$(grep -oE 'href="[^"]*download-ota[^"]*"' PIXEL_BETA_HTML | cut -d'"' -f2 | head -n1)
-
-# If not found on version page, search main versions page or use fallback endpoint
-if [ -z "$OTA_PAGE_PATH" ]; then
-  OTA_PAGE_PATH=$(grep -oE 'href="[^"]*download-ota[^"]*"' PIXEL_VERSIONS_HTML | cut -d'"' -f2 | head -n1)
-fi
-
-if [ -z "$OTA_PAGE_PATH" ]; then
-  OTA_PAGE_URL="https://developer.android.com/about/versions/preview/download-ota"
-elif [[ "$OTA_PAGE_PATH" != http* ]]; then
-  OTA_PAGE_URL="https://developer.android.com${OTA_PAGE_PATH}"
+# Attempt to fetch the Android 17 OTA page
+if wget -q -O PIXEL_OTA_HTML --no-check-certificate "$URL_A17" 2>/dev/null && grep -q 'ota/.*_beta' PIXEL_OTA_HTML; then
+  echo "Targeting Endpoint: $URL_A17"
+elif wget -q -O PIXEL_OTA_HTML --no-check-certificate "$URL_PREVIEW" 2>/dev/null && grep -q 'ota/.*_beta' PIXEL_OTA_HTML; then
+  echo "Targeting Endpoint: $URL_PREVIEW"
 else
-  OTA_PAGE_URL="$OTA_PAGE_PATH"
+  echo "Error: Unable to locate Android 17 Beta OTA links on Google's portal!"
+  exit 1
 fi
-
-echo "Fetching OTA Page: $OTA_PAGE_URL"
-wget -q -O PIXEL_OTA_HTML --no-check-certificate "$OTA_PAGE_URL" || exit 1
 
 # Extract date metadata
 BETA_REL_DATE="$(date -d "$(grep -m1 -A1 'Release date' PIXEL_OTA_HTML | tail -n1 | sed 's;.*<td>\(.*\)</td>.*;\1;')" '+%Y-%m-%d' 2>/dev/null || date '+%Y-%m-%d')"
@@ -49,11 +30,11 @@ PRODUCT_LIST="$(grep -o 'ota/.*_beta' PIXEL_OTA_HTML | cut -d\/ -f2)"
 OTA_LIST="$(grep 'ota/.*_beta' PIXEL_OTA_HTML | cut -d\" -f2)"
 
 if [ -z "$PRODUCT_LIST" ]; then
-  echo "Error: No Pixel Beta OTA links found on $OTA_PAGE_URL"
+  echo "Error: No Pixel Beta OTA links found on page."
   exit 1
 fi
 
-# Check for targeted device flag (-m device_name)
+# Target device override flag (-m device_name)
 TARGET_DEVICE=""
 if [ "$1" == "-m" ] && [ -n "$2" ]; then
   TARGET_DEVICE="$2"
@@ -71,9 +52,9 @@ elif command -v getprop >/dev/null 2>&1 && [ -n "$(getprop ro.product.device 2>/
   OTA="$(echo "$OTA_LIST" | grep "$PRODUCT" | head -n1)"
 fi
 
-# Select a random Pixel device if no explicit target was set
+# Default to random selection if no specific device is targeted
 if [ -z "$OTA" ] || [ -z "$PRODUCT" ]; then
-  echo "Selecting random Pixel Beta device..."
+  echo "Selecting random Pixel device from Android 17 list..."
   list_count="$(echo "$PRODUCT_LIST" | wc -l)"
   list_rand="$((RANDOM % list_count + 1))"
 
@@ -92,8 +73,8 @@ fi
 
 echo "Selected Device: $MODEL ($PRODUCT)"
 
-# Download OTA metadata
-(ulimit -f 4; wget -q -O PIXEL_ZIP_METADATA --no-check-certificate "$OTA") 2>/dev/null || true
+# Download first 32KB of OTA zip headers safely for metadata parsing
+wget -q --header="Range: bytes=0-32768" -O PIXEL_ZIP_METADATA --no-check-certificate "$OTA" || true
 
 FINGERPRINT="$(grep -am1 'post-build=' PIXEL_ZIP_METADATA | cut -d= -f2 | tr -d '\r')"
 SECURITY_PATCH="$(grep -am1 'security-patch-level=' PIXEL_ZIP_METADATA | cut -d= -f2 | tr -d '\r')"
@@ -106,7 +87,7 @@ fi
 echo "Extracted Fingerprint: $FINGERPRINT"
 echo "Extracted Security Patch: $SECURITY_PATCH"
 
-# Generate pif.json output
+# Output pif.json
 cat <<EOF > pif.json
 {
   "MANUFACTURER": "Google",
@@ -119,7 +100,7 @@ cat <<EOF > pif.json
 }
 EOF
 
-echo "Successfully dumped values to pif.json"
+echo "Successfully dumped Android 17 values to pif.json"
 
 # Remove temporary HTML files if they exist
 find . -maxdepth 1 -name "*_HTML" -exec rm {} \;
